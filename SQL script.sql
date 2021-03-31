@@ -3,21 +3,21 @@ CREATE TABLE leilao (
 	titulo		 VARCHAR(64) NOT NULL,
 	descricao		 VARCHAR(1024),
 	precominimo		 FLOAT(8) DEFAULT 0,
-	limite_data		 VARCHAR(16) NOT NULL,
+	limite_data		 DATE NOT NULL,
 	limite_hora		 VARCHAR(8) NOT NULL,
-	mural		 VARCHAR(4096),
 	fechado		 BOOL NOT NULL DEFAULT False,
 	vencedorid		 BIGINT,
-	vendedor_user_userid	 BIGINT,
-	produto_artigoid	 BIGINT,
-	vendedor_user_userid1 BIGINT NOT NULL,
-	PRIMARY KEY(leilaoid,vendedor_user_userid,produto_artigoid)
+	vendedor_user_userid BIGINT,
+	PRIMARY KEY(leilaoid,vendedor_user_userid)
 );
 
 CREATE TABLE produto (
-	artigoid	 BIGINT,
-	nome_produto VARCHAR(128) NOT NULL,
-	PRIMARY KEY(artigoid)
+	artigoid			 BIGINT,
+	nome_produto		 VARCHAR(128) NOT NULL,
+	leiloado			 BOOL NOT NULL DEFAULT False,
+	leilao_leilaoid		 BIGINT,
+	leilao_vendedor_user_userid BIGINT,
+	PRIMARY KEY(artigoid,leilao_leilaoid,leilao_vendedor_user_userid)
 );
 
 CREATE TABLE user (
@@ -44,10 +44,10 @@ CREATE TABLE inbox (
 );
 
 CREATE TABLE mensagem (
-	remetente	 VARCHAR(128) NOT NULL,
+	remetente		 VARCHAR(128) NOT NULL,
 	conteudo		 VARCHAR(4096) NOT NULL,
-	inbox_user_userid BIGINT,
-	PRIMARY KEY(inbox_user_userid)
+	mural_leilao_leilaoid BIGINT,
+	PRIMARY KEY(mural_leilao_leilaoid)
 );
 
 CREATE TABLE historico (
@@ -55,19 +55,33 @@ CREATE TABLE historico (
 	comprador_user_userid	 BIGINT,
 	leilao_leilaoid		 BIGINT,
 	leilao_vendedor_user_userid BIGINT,
-	leilao_produto_artigoid	 BIGINT,
-	PRIMARY KEY(leilao_leilaoid,leilao_vendedor_user_userid,leilao_produto_artigoid)
+	PRIMARY KEY(leilao_leilaoid,leilao_vendedor_user_userid)
+);
+
+CREATE TABLE mural (
+	leilao_leilaoid		 BIGINT,
+	leilao_vendedor_user_userid BIGINT,
+	PRIMARY KEY(leilao_leilaoid,leilao_vendedor_user_userid)
+);
+
+CREATE TABLE inbox_mensagem (
+	inbox_user_userid		 BIGINT,
+	mensagem_mural_leilao_leilaoid BIGINT,
+	PRIMARY KEY(inbox_user_userid,mensagem_mural_leilao_leilaoid)
 );
 
 ALTER TABLE leilao ADD CONSTRAINT leilao_fk1 FOREIGN KEY (vendedor_user_userid) REFERENCES vendedor(user_userid);
-ALTER TABLE leilao ADD CONSTRAINT leilao_fk2 FOREIGN KEY (produto_artigoid) REFERENCES produto(artigoid);
-ALTER TABLE leilao ADD CONSTRAINT leilao_fk3 FOREIGN KEY (vendedor_user_userid1) REFERENCES vendedor(user_userid);
+ALTER TABLE produto ADD CONSTRAINT produto_fk1 FOREIGN KEY (leilao_leilaoid) REFERENCES leilao(leilaoid);
+ALTER TABLE produto ADD CONSTRAINT produto_fk2 FOREIGN KEY (leilao_vendedor_user_userid) REFERENCES leilao(vendedor_user_userid);
 ALTER TABLE vendedor ADD CONSTRAINT vendedor_fk1 FOREIGN KEY (user_userid) REFERENCES user(userid);
 ALTER TABLE comprador ADD CONSTRAINT comprador_fk1 FOREIGN KEY (user_userid) REFERENCES user(userid);
 ALTER TABLE inbox ADD CONSTRAINT inbox_fk1 FOREIGN KEY (user_userid) REFERENCES user(userid);
-ALTER TABLE mensagem ADD CONSTRAINT mensagem_fk1 FOREIGN KEY (inbox_user_userid) REFERENCES inbox(user_userid);
+ALTER TABLE mensagem ADD CONSTRAINT mensagem_fk1 FOREIGN KEY (mural_leilao_leilaoid) REFERENCES mural(leilao_leilaoid);
 ALTER TABLE historico ADD CONSTRAINT historico_fk1 FOREIGN KEY (comprador_user_userid) REFERENCES comprador(user_userid);
 ALTER TABLE historico ADD CONSTRAINT historico_fk2 FOREIGN KEY (leilao_leilaoid) REFERENCES leilao(leilaoid);
 ALTER TABLE historico ADD CONSTRAINT historico_fk3 FOREIGN KEY (leilao_vendedor_user_userid) REFERENCES leilao(vendedor_user_userid);
-ALTER TABLE historico ADD CONSTRAINT historico_fk4 FOREIGN KEY (leilao_produto_artigoid) REFERENCES leilao(produto_artigoid);
+ALTER TABLE mural ADD CONSTRAINT mural_fk1 FOREIGN KEY (leilao_leilaoid) REFERENCES leilao(leilaoid);
+ALTER TABLE mural ADD CONSTRAINT mural_fk2 FOREIGN KEY (leilao_vendedor_user_userid) REFERENCES leilao(vendedor_user_userid);
+ALTER TABLE inbox_mensagem ADD CONSTRAINT inbox_mensagem_fk1 FOREIGN KEY (inbox_user_userid) REFERENCES inbox(user_userid);
+ALTER TABLE inbox_mensagem ADD CONSTRAINT inbox_mensagem_fk2 FOREIGN KEY (mensagem_mural_leilao_leilaoid) REFERENCES mensagem(mural_leilao_leilaoid);
 
