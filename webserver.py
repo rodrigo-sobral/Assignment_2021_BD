@@ -1,15 +1,11 @@
-from flask import Flask
+from flask import Flask, request
 from flask_restful import Api, Resource, reqparse, abort, fields, marshal_with
 from flask_sqlalchemy import SQLAlchemy
+import psycopg2
+import uuid
 
 app = Flask(__name__)
 api = Api(app)
 
-class HelloWorld(Resource):
-    def get(self):
-        return {"content": "HelloWorld"}
-
-api.add_resource(HelloWorld, '/helloworld')
-
-
-if __name__ == "__main__": app.run(debug=True)
+if __name__ == "__main__": 
+    app.run(debug=True, port=8080)

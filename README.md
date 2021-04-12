@@ -50,12 +50,34 @@ To do that, we decided to firstly create a `mural` where all `users` can post (o
 ___
 ## Database Management :books:
 
-TBD...
+Database Main Operations:
+- Insertions `(insert into ...)`
+- Consultations `(select ... from ...)`
+- Editions `(alter table ...)`
+
+Conflicts Solutions:
+- When an **insertion** or **edition** is made in the database, a **commit** must be done after it's completed.
+- For now, we don't think there's no need to even lock tables, since there are few common data manipulations in the checklist presented below.
+- As we can see, the majority of the tasks are about listings and consultations, this is, data readings, so we won't have many data conflits.
 
 ___
-## Initial Plan :brain:
+## Initial Plan - CheckList :brain: :clipboard:
 
-TBD...
+Task | Responsable | Done
+-- | -- | --
+Registo de utilizadores. | Rodrigo | :heavy_check_mark:
+Autenticação de utilizadores. | Rodrigo | :x:
+Criar um novo leilão. | Diogo | :x:
+Listar todos os leilões existentes. | Diogo | :x:
+Pesquisar leilões existentes. | Diogo | :x:
+Consultar detalhes de um leilão. | Diogo | :x:
+Listar todos os leilões em que o utilizador tenha atividade. | Diogo | :x:
+Efetuar uma licitação num leilão. | Rodrigo | :x:
+Editar propriedades de um leilão. | Diogo | :x:
+Escrever mensagem no mural de um leilão. | Rodrigo | :x:
+Entrega imediata de notificações a utilizadores. | Rodrigo | :x:
+Notificação de licitação ultrapassada. | Rodrigo | :x:
+Término do leilão na data, hora e minuto marcados. | Diogo | :x:
 
 ___
 

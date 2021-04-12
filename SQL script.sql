@@ -20,7 +20,7 @@ CREATE TABLE produto (
 	PRIMARY KEY(artigoid,leilao_leilaoid,leilao_vendedor_user_userid)
 );
 
-CREATE TABLE user (
+CREATE TABLE users (
 	userid	 BIGINT,
 	email	 VARCHAR(64) NOT NULL,
 	username VARCHAR(128) NOT NULL,
@@ -41,8 +41,8 @@ CREATE TABLE comprador (
 CREATE TABLE mensagem (
 	conteudo		 VARCHAR(4096) NOT NULL,
 	mural_leilao_leilaoid BIGINT,
-	user_userid		 BIGINT NOT NULL,
-	PRIMARY KEY(mural_leilao_leilaoid)
+	user_userid		 BIGINT,
+	PRIMARY KEY(mural_leilao_leilaoid,user_userid)
 );
 
 CREATE TABLE historico (
@@ -66,17 +66,18 @@ CREATE TABLE licitacao (
 
 CREATE TABLE inbox (
 	mensagem_mural_leilao_leilaoid BIGINT,
-	user_userid			 BIGINT,
+	mensagem_user_userid		 BIGINT,
+	user_userid BIGINT,
 	PRIMARY KEY(user_userid)
 );
 
 ALTER TABLE leilao ADD CONSTRAINT leilao_fk1 FOREIGN KEY (vendedor_user_userid) REFERENCES vendedor(user_userid);
 ALTER TABLE produto ADD CONSTRAINT produto_fk1 FOREIGN KEY (leilao_leilaoid) REFERENCES leilao(leilaoid);
 ALTER TABLE produto ADD CONSTRAINT produto_fk2 FOREIGN KEY (leilao_vendedor_user_userid) REFERENCES leilao(vendedor_user_userid);
-ALTER TABLE vendedor ADD CONSTRAINT vendedor_fk1 FOREIGN KEY (user_userid) REFERENCES user(userid);
-ALTER TABLE comprador ADD CONSTRAINT comprador_fk1 FOREIGN KEY (user_userid) REFERENCES user(userid);
+ALTER TABLE vendedor ADD CONSTRAINT vendedor_fk1 FOREIGN KEY (user_userid) REFERENCES users(userid);
+ALTER TABLE comprador ADD CONSTRAINT comprador_fk1 FOREIGN KEY (user_userid) REFERENCES users(userid);
 ALTER TABLE mensagem ADD CONSTRAINT mensagem_fk1 FOREIGN KEY (mural_leilao_leilaoid) REFERENCES mural(leilao_leilaoid);
-ALTER TABLE mensagem ADD CONSTRAINT mensagem_fk2 FOREIGN KEY (user_userid) REFERENCES user(userid);
+ALTER TABLE mensagem ADD CONSTRAINT mensagem_fk2 FOREIGN KEY (user_userid) REFERENCES users(userid);
 ALTER TABLE historico ADD CONSTRAINT historico_fk1 FOREIGN KEY (leilao_leilaoid) REFERENCES leilao(leilaoid);
 ALTER TABLE historico ADD CONSTRAINT historico_fk2 FOREIGN KEY (leilao_vendedor_user_userid) REFERENCES leilao(vendedor_user_userid);
 ALTER TABLE mural ADD CONSTRAINT mural_fk1 FOREIGN KEY (leilao_leilaoid) REFERENCES leilao(leilaoid);
@@ -84,5 +85,6 @@ ALTER TABLE mural ADD CONSTRAINT mural_fk2 FOREIGN KEY (leilao_vendedor_user_use
 ALTER TABLE licitacao ADD CONSTRAINT licitacao_fk1 FOREIGN KEY (historico_leilao_leilaoid) REFERENCES historico(leilao_leilaoid);
 ALTER TABLE licitacao ADD CONSTRAINT licitacao_fk2 FOREIGN KEY (comprador_user_userid) REFERENCES comprador(user_userid);
 ALTER TABLE inbox ADD CONSTRAINT inbox_fk1 FOREIGN KEY (mensagem_mural_leilao_leilaoid) REFERENCES mensagem(mural_leilao_leilaoid);
-ALTER TABLE inbox ADD CONSTRAINT inbox_fk2 FOREIGN KEY (user_userid) REFERENCES user(userid);
+ALTER TABLE inbox ADD CONSTRAINT inbox_fk2 FOREIGN KEY (mensagem_user_userid) REFERENCES mensagem(user_userid);
+ALTER TABLE inbox ADD CONSTRAINT inbox_fk3 FOREIGN KEY (user_userid) REFERENCES users(userid);
 
