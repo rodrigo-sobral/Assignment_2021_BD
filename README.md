@@ -21,31 +21,37 @@ ___
 Below we explain how and why we built this RE structure
 
 ![Relationship Entity Diagram](screenshots/Screenshot_ERDiagram.png)
+![Relationship Entity Diagram](screenshots/Screenshot_RDM.png)
 
 :one: Users
 
 We started building users subsystem. 
 
-So we decided to separate `buyers` and `sellers` because both are able to do different things, a `seller`, for example, is able to create several auctions (at leasts one, otherwise he isn't even considered a seller), by other side, `buyer` can bid several auctions (at least one too, for the same reason as the previous one). However, they still being descended entities from `user`, which means a `user` can be simultaneously a `seller` and a `buyer`, that's why, plus redundancy avoidance, whe used a `complete inheritance`.
-
+So we decided to create one single entity `users` because both are able to create and bid several auctions. The only problem this may cause (and must be fixed in the "coding part") is when an `user` tries to bid his own auction (he must be forbidden to do it).
 
 :two: Auction
 
 After that, we implemented `auction` and its involved entities.
 
-An `auction` is created by one and only one `seller` and must have a biding `product` associated. In other words, an `auction` existance doesn't make sense without a `product`, so `product` is a weak entity.
+An `auction` is created by one and only one `user` and must have a `product` associated, an `version_history` to stored the previous versions of that `auction` and a `mural` (we'll approach this one in the next topics).
+
+The `version_history` has several `auctions` with the same ID, so it has to have its own ID to identify each version, that's why it is not a weak entity, compared to `auction`.
 
 :three: Biddings
 
-Associated to each `auction`, there's a bidding `history`. Is here where every `biddings` are stored and can be consulted later (even there's no one).
+Associated to each `auction`, there's a bidding history. Is here where every `biddings` are stored and can be consulted later (even there's no one).
 
-Each `bidding` contains the propused value, the `buyer` ID and the corresponding `history` ID, which belongs to a certain `auction`.
+Each `bidding` contains the propused value, the buyer ID and the corresponding `auction` ID, which belongs to a certain `user`.
 
 :four: Messages & Notifications
 
-One more thing it was proposed, was to build a notification ecosystem relationated to `auctions` and general `users`. 
+One more thing it was proposed, was to build a notification ecosystem relationated to `auctions` and `users`. 
 
-To do that, we decided to firstly create a `mural` where all `users` can post (or not) several `messages`. Besides that, `buyers` who had an overlaid `bid`, had to (once again, or not) receive a `message` (once again, or several) warning them. So we created an `inbox`, which works like a bridge between `users` and `messages` from `auctions`.
+To do that, we decided to firstly create like two communications bridges:
+1. `users` -> `mural` -> `auction`
+1. `auction` -> `inbox` -> `users`
+
+So, `users` have an associated `inbox` (identified by users ID) where several messages can be written by `auctions` (*aka* notifications) and, same way, `auctions` have an associated `mural` (identified by auctions ID) where several messages can be written by `users`.
 
 ___
 ## Database Management :books:
