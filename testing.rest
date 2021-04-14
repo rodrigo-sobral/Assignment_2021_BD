@@ -1,5 +1,0 @@
-POST http://127.0.0.1:8080/dbproj/user
-Content-Type: application/json
-
-{"username": "Diogo", "email": "uc201882734@student.uc.pt", "password": "teste123"}
-
