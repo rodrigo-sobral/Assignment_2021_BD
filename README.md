@@ -17,8 +17,32 @@ ___
 
 ## How to run it :running:
 
-npm init -y
-npm install express
+`npm init -y`
+`npm install express body-parser pg-promise jest axios --save`
+
+### How to test it :vertical_traffic_light:
+
+`npm run test`
+
+___
+
+## Actual Plan - CheckList :brain: :clipboard:
+
+Task | Responsable | Done
+-- | -- | --
+Registo de utilizadores. | Rodrigo | :heavy_check_mark:
+Autenticação de utilizadores. | Rodrigo | :heavy_check_mark:
+Criar um novo leilão. | Diogo | :x:
+Listar todos os leilões existentes. | Diogo | :x:
+Pesquisar leilões existentes. | Diogo | :x:
+Consultar detalhes de um leilão. | Diogo | :x:
+Listar todos os leilões em que o utilizador tenha atividade. | Diogo | :x:
+Efetuar uma licitação num leilão. | Rodrigo | :x:
+Editar propriedades de um leilão. | Diogo | :x:
+Escrever mensagem no mural de um leilão. | Rodrigo | :x:
+Entrega imediata de notificações a utilizadores. | Rodrigo | :x:
+Notificação de licitação ultrapassada. | Rodrigo | :x:
+Término do leilão na data, hora e minuto marcados. | Diogo | :x:
 
 ___
 
