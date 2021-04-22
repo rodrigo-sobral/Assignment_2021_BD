@@ -34,3 +34,23 @@ exports.authenticateUser= async (user) => {
     }
 }
 
+exports.postNewAuction= async (new_auction) => {
+    const user_result= await data_management.searchSpecificUser('userid', 'authtoken', new_auction['authToken']);
+    const artigo_result= await data_management.searchSpecificArtigo('artigoId, leiloado', 'artigoId', new_auction['artigoId']);
+    if (user_result.length!=1) throw new Error('Esse Username nao esta registado');
+    else if (artigo_result.length!=1) throw new Error('Esse Artigo nao esta registado');
+    else if (artigo_result[0]['leiloado']==true) throw new Error('Esse Artigo ja se encontra a ser leiloado');
+    else {
+        try {
+            await data_management.postAuction(new_auction, user_result[0]['userid']);   
+            await data_management.unAvailableArtigo(new_auction['artigoId'], true);
+            const leilaoId= await data_management.getLastAuctionOfUser('leilaoId', user_result[0]['userid'], new_auction['artigoId']);
+            delete Object.assign(leilaoId[0], {['leilaoId']: leilaoId[0]['max'] })['max'];
+            return leilaoId;
+        } catch (e) { 
+            if (e.message.includes('date/time field value out of range') || e.message.includes('invalid input syntax for type timestamp:')) 
+                throw new Error('Inseriu um formato de Data invalido'); 
+            else throw new Error('Erro desconhecido, contacte o Administrador!'); 
+        }
+    }
+}

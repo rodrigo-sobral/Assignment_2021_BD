@@ -32,7 +32,7 @@ Task | Responsable | Done
 -- | -- | --
 Registo de utilizadores. | Rodrigo | :heavy_check_mark:
 Autenticação de utilizadores. | Rodrigo | :heavy_check_mark:
-Criar um novo leilão. | Diogo | :x:
+Criar um novo leilão. | Rodrigo | :heavy_check_mark:
 Listar todos os leilões existentes. | Diogo | :x:
 Pesquisar leilões existentes. | Diogo | :x:
 Consultar detalhes de um leilão. | Diogo | :x:
