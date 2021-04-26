@@ -18,7 +18,8 @@ ___
 ## How to run it :running:
 
 `npm init -y`
-`npm install express body-parser pg-promise jest axios --save`
+
+`npm install express body-parser pg-promise jest axios jsonwebtoken dotenv-safe`
 
 ### How to test it :vertical_traffic_light:
 
@@ -33,9 +34,9 @@ Task | Responsable | Done
 Registo de utilizadores. | Rodrigo | :heavy_check_mark:
 Autenticação de utilizadores. | Rodrigo | :heavy_check_mark:
 Criar um novo leilão. | Rodrigo | :heavy_check_mark:
-Listar todos os leilões existentes. | Diogo | :x:
-Pesquisar leilões existentes. | Diogo | :x:
-Consultar detalhes de um leilão. | Diogo | :x:
+Listar todos os leilões existentes. | Rodrigo | :heavy_check_mark:
+Pesquisar leilões existentes. | Rodrigo | :heavy_check_mark:
+Consultar detalhes de um leilão. | Rodrigo | :heavy_check_mark:
 Listar todos os leilões em que o utilizador tenha atividade. | Diogo | :x:
 Efetuar uma licitação num leilão. | Rodrigo | :x:
 Editar propriedades de um leilão. | Diogo | :x:

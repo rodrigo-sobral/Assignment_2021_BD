@@ -20,6 +20,22 @@ router.post('/dbproj/user', async function (req, res, next) {
 	}
 });
 
+/*
+app.post('/login', (req, res, next) => {
+    //esse teste abaixo deve ser feito no seu banco de dados
+    if(req.body.user === 'luiz' && req.body.password === '123'){
+      //auth ok
+      const id = 1; //esse id viria do banco de dados
+      const token = jwt.sign({ id }, process.env.SECRET, {
+        expiresIn: 300 // expires in 5min
+      });
+      return res.json({ auth: true, token: token });
+    }
+    
+    res.status(500).json({message: 'Login inválido!'});
+})
+*/
+
 router.put('/dbproj/user', async function (req, res, next) {
     const login_user= req.body
     if (!login_user) res.status(418).send('Deve inserir um Utilizador Registado!')
@@ -29,6 +45,16 @@ router.put('/dbproj/user', async function (req, res, next) {
             res.status(201).json({authToken: auth_token});
         } catch (e) { next(e); }
 	}
+});
+
+/**
+ * TODO
+ * ERRO PRA CORRIGIR: null value in column "authtoken" of relation "users" violates not-null constraint
+ * AUTHTOKEN DEVE PODER SER NULL, PORQUE, SE O UTILIZADOR NAO INICIAR SESSAO, O AUTH TOKEN ESTÁ A NULL
+ */
+
+router.post('/dbproj/user/logout', function(req, res) {
+    res.json({ auth: false, token: null });
 });
 
 router.post('/dbproj/leilao', async function (req, res, next) {
@@ -47,4 +73,25 @@ router.post('/dbproj/leilao', async function (req, res, next) {
     else
         res.status(418).send({erro: 'Deve inserir um Novo Leilao com o seguinte conteudo: {\'titulo\', \'descricao\', \'precoMinimo\' (nao obrigatorio), \'limite\', \'artigoId\', \'authToken\'}'})
 });
+
+router.get('/dbproj/leiloes', async function (req, res, next) {
+    const auctions= await server_service.getAllAuctions();
+    if (auctions.length==0) res.status(404).json({erro: 'Nao ha leiloes registados'});
+    else res.status(200).json(auctions);
+});
+
+router.get('/dbproj/leilao/', async function (req, res, next) {
+    if (req.query.keyword) {
+        const auctions= await server_service.getSpecificAuctionsBy(req.query.keyword);
+        if (auctions.length==0) res.status(404).json({erro: 'Nao ha leiloes registados'});
+        else res.status(200).json(auctions);
+    } else if (req.query.leilaoId) {
+        const auctions= await server_service.searchSpecificAuction(req.query.leilaoId);
+        if (auctions.length==0) res.status(404).json({erro: 'Nao ha leiloes registados'});
+        else res.status(200).json(auctions);
+    } else {
+        res.status(418).send({erro: 'A query deve ter o seguinte formato: .../?keyword= ou .../?leilaoId='});
+    }
+});
+
 module.exports= router;
