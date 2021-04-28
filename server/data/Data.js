@@ -13,16 +13,17 @@ exports.postUser = async (new_user) => {
 	return database.query('insert into users (username, email, password, authtoken) values ($1, $2, $3, $4)', [new_user.username, new_user.email, new_user.password, new_user.authtoken])
 }
 
-exports.authenticateUser= async (parameter_value1, parameter_value2) => {
-	return database.query(`select * from users where username= \'${parameter_value1}\' and password=\'${parameter_value2}\'`);
+exports.login= async (username, password) => {
+	return database.query(`select * from users where username= \'${username}\' and password=\'${password}\'`);
 }
 
 exports.searchSpecificUser= async (what_to_get, parameter, parameter_value) => {
 	return database.query(`select ${what_to_get} from users where ${parameter}= \'${parameter_value}\'`);
 }
 
-exports.updateUserAuthToken= async (userId, authToken) => {
-	return database.query(`update users set authToken= $1 where userId= $2`, [authToken, userId]);
+exports.updateUserAuthToken= async (authToken, parameter, parameter_value) => {
+	if (authToken!=null) return database.query(`update users set authtoken= \'${authToken}\' where ${parameter}= \'${parameter_value}\'`);
+	else return database.query(`update users set authtoken=null where ${parameter}= \'${parameter_value}\'`);
 }
 
 

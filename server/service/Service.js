@@ -1,6 +1,5 @@
 const data_management = require('../data/Data');
 const crypto = require('crypto')
-const { v4: uuidv4 } = require('uuid');
 const jwt = require('jsonwebtoken');
 require("dotenv-safe").config();
 
@@ -22,17 +21,27 @@ exports.postNewUser= async (new_user) => {
     }
 }
 
-exports.authenticateUser= async (user) => {
+exports.searchUserByAuthToken= async (authToken) => {
+    try { return await data_management.searchSpecificUser('*', 'authtoken', authToken); } 
+    catch (e) { return null; }
+}
+
+exports.login= async (user) => {
     const TIME_TO_EXPIRE= 60*60; // 60s * 60 min
     const encrypted_pass= crypto.createHash('sha512').update(user['password']).digest('hex');
-    const result= await data_management.authenticateUser(user['username'], encrypted_pass);
+    const result= await data_management.login(user['username'], encrypted_pass);
     if (result && result.length==0) throw new Error('Utilizador ou palavra-chave invalidos. Por favor, tente novamente.');
+    else if (result[0]['authtoken']) throw new Error('Voce ja tem a sessao iniciada!');
     else {
-        const user_id= result[0]['userId'];
-        const authToken = jwt.sign({ user_id }, process.env.SECRET, { expiresIn: TIME_TO_EXPIRE });
-        data_management.updateUserAuthToken(user_id, authToken);
+        const user_id= result[0]['userid'];
+        const authToken = jwt.sign({ user_id }, process.env.SECRET, { expiresIn: TIME_TO_EXPIRE })
+        await data_management.updateUserAuthToken(authToken, 'userId', user_id);
         return authToken;
     }
+}
+
+exports.logout= async (authToken) => {
+    await data_management.updateUserAuthToken(null, 'authtoken', authToken);
 }
 
 exports.postNewAuction= async (new_auction) => {
@@ -70,9 +79,6 @@ exports.getSpecificAuctionsBy= async (keyword) => {
 }
 
 exports.searchSpecificAuction= async (leilaoId) => {
-    try {
-        return await data_management.searchSpecificAuction("*", "leilaoId", leilaoId);
-    } catch (e) {
-        throw new Error('Insira um leilaoId valido!'); 
-    }
+    try { return await data_management.searchSpecificAuction("*", "leilaoId", leilaoId);
+    } catch (e) { throw new Error('Insira um leilaoId valido!'); }
 }
