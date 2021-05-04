@@ -39,10 +39,10 @@ Pesquisar leilões existentes. | Rodrigo | :heavy_check_mark:
 Consultar detalhes de um leilão. | Rodrigo | :heavy_check_mark:
 Listar todos os leilões em que o utilizador tenha atividade. | Diogo | :x:
 Efetuar uma licitação num leilão. | Rodrigo | :x:
-Editar propriedades de um leilão. | Diogo | :x:
-Escrever mensagem no mural de um leilão. | Rodrigo | :x:
-Entrega imediata de notificações a utilizadores. | Rodrigo | :x:
-Notificação de licitação ultrapassada. | Rodrigo | :x:
+Editar propriedades de um leilão. | Rodrigo | :heavy_check_mark:
+Escrever mensagem no mural de um leilão. | Diogo | :x:
+Entrega imediata de notificações a utilizadores. | Diogo | :x:
+Notificação de licitação ultrapassada. | Diogo | :x:
 Término do leilão na data, hora e minuto marcados. | Diogo | :x:
 
 ___

@@ -3,8 +3,8 @@ CREATE TABLE leilao (
 	leilaoid	 serial PRIMARY KEY,
 	titulo		 VARCHAR(64) NOT NULL,
 	descricao	 TEXT,
-	preco_minimo	 FLOAT(8) DEFAULT 0,
-	limite_data_hora TIMESTAMP NOT NULL,
+	precominimo	 FLOAT(8) DEFAULT 0,
+	limite TIMESTAMP NOT NULL,
 	fechado		 BOOLEAN NOT NULL DEFAULT False,
 	users_userid	 BIGINT NOT NULL,
 	artigo_artigoid	 BIGINT NOT NULL
@@ -43,8 +43,8 @@ CREATE TABLE historico_versoes (
 	versaoid	 serial PRIMARY KEY,
 	titulo		 VARCHAR(64) NOT NULL,
 	descricao	 TEXT,
-	preco_minimo	 FLOAT(8) DEFAULT 0,
-	limite_data_hora TIMESTAMP NOT NULL,
+	precominimo	 FLOAT(8) DEFAULT 0,
+	limite TIMESTAMP NOT NULL,
 	leilao_leilaoid	 BIGINT NOT NULL
 );
 
