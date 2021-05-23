@@ -22,7 +22,7 @@ CREATE TABLE users (
 	username	 VARCHAR(128) UNIQUE NOT NULL,
 	password	 VARCHAR(128) NOT NULL,
 	email	 VARCHAR(64) UNIQUE NOT NULL,
-	authtoken VARCHAR(128) UNIQUE NOT NULL
+	authtoken VARCHAR(128)
 );
 
 CREATE TABLE mural (
@@ -32,11 +32,10 @@ CREATE TABLE mural (
 );
 
 CREATE TABLE licitacao (
-	licitacaoid	 BIGINT UNIQUE,
+	licitacaoid	 serial PRIMARY KEY,
 	valor_licitado	 FLOAT(8) NOT NULL,
 	users_userid	 BIGINT,
-	leilao_leilaoid BIGINT,
-	PRIMARY KEY(licitacaoid,users_userid,leilao_leilaoid)
+	leilao_leilaoid BIGINT
 );
 
 CREATE TABLE historico_versoes (
