@@ -6,6 +6,7 @@ CREATE TABLE leilao (
 	precominimo	 FLOAT(8) DEFAULT 0,
 	limite TIMESTAMP NOT NULL,
 	fechado		 BOOLEAN NOT NULL DEFAULT False,
+	vencedorid	BIGINT DEFAULT NULL,
 	users_userid	 BIGINT NOT NULL,
 	artigo_artigoid	 BIGINT NOT NULL
 );
@@ -55,6 +56,7 @@ CREATE TABLE inbox (
 
 ALTER TABLE leilao ADD CONSTRAINT leilao_fk1 FOREIGN KEY (users_userid) REFERENCES users(userid);
 ALTER TABLE leilao ADD CONSTRAINT leilao_fk2 FOREIGN KEY (artigo_artigoid) REFERENCES artigo(artigoid);
+ALTER TABLE leilao ADD CONSTRAINT leilao_fk3 FOREIGN KEY (vencedorid) REFERENCES users(userid);
 ALTER TABLE mural ADD CONSTRAINT mural_fk1 FOREIGN KEY (leilao_leilaoid) REFERENCES leilao(leilaoid);
 ALTER TABLE mural ADD CONSTRAINT mural_fk2 FOREIGN KEY (users_userid) REFERENCES users(userid);
 ALTER TABLE licitacao ADD CONSTRAINT licitacao_fk1 FOREIGN KEY (users_userid) REFERENCES users(userid);

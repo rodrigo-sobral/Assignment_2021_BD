@@ -89,7 +89,7 @@ router.get('/dbproj/leiloes', async function (req, res, next) {
         if (!await tokenAuthentication(req, res)) return;
         //  CHECK THE AMOUNT OF PARAMETERS
         if (Object.keys(req.query).length==1 && req.query.keyword) {
-            const auctions= await server_service.getAuctionByArtigoOrDescricao(req.query.keyword);
+            const auctions= await server_service.getAuctionByArtigoidOrDescricao(req.query.keyword);
             if (auctions.length==0) return res.status(404).json({erro: `Nao foram encontrados leiloes com o keyword= ${req.query.keyword}`});
             return res.status(200).json(auctions);
         } 
@@ -103,7 +103,7 @@ router.get('/dbproj/leiloes', async function (req, res, next) {
     return res.status(401).json({ erro: 'Deve passar o authToken do usuario como parametro dos headers' });
 });
 
-//  GET SPECIFIC AUCTION BY ARTIGOID
+//  GET ALL INFORMATION ABOUT A SPECIFIC AUCTION BY LEILAOID
 //  ========================================================================================
 router.get('/dbproj/leilao', async function (req, res, next) {
     if (req.headers.authtoken) {
@@ -121,7 +121,7 @@ router.get('/dbproj/leilao', async function (req, res, next) {
 
 //  GET ACTIVITY OF THE USER
 //  ========================================================================================
-router.get('/dbproj/leiloes/atividade', async function (req, res, next) {
+router.get('/dbproj/user/atividade', async function (req, res, next) {
     if (req.headers.authtoken) {
         if (!await tokenAuthentication(req, res)) return;
         return res.status(200).json(await server_service.getUserActivity(req.headers.authtoken));
@@ -166,10 +166,29 @@ router.post('/dbproj/leilao/mural', async function (req, res, next) {
         if (!req.query.leilaoId) return res.status(400).json({erro: 'Deve passar o leilaoId por parametro'});
         if (!req.body["mensagem"]) return res.status(400).json({erro: 'Deve inserir a sua mensagem com o formato { mensagem: ... }'});
 
-        try { return res.status(200).json({postId: await server_service.writeInMural(req.query.leilaoId, req.headers.authtoken, req.body["mensagem"])}); } 
+        try { return res.status(200).json({resp: await server_service.writeInMural(req.query.leilaoId, req.headers.authtoken, req.body["mensagem"])}); } 
         catch (e) { next(e); }
     } else return res.status(401).json({ erro: 'Deve passar o authToken do usuario como parametro dos headers' });
 });
+
+//  CHECK INBOX
+//  ========================================================================================
+router.get('/dbproj/user/inbox', async function (req, res, next) {
+    if (req.headers.authtoken) {
+        if (!await tokenAuthentication(req, res)) return;
+        return res.status(200).json({inbox: await server_service.checkUserInbox(req.headers.authtoken)});
+    } else return res.status(401).json({ erro: 'Deve passar o authToken do usuario como parametro dos headers' });
+});
+
+//  CLEAR INBOX
+//  ========================================================================================
+router.delete('/dbproj/user/inbox', async function (req, res, next) {
+    if (req.headers.authtoken) {
+        if (!await tokenAuthentication(req, res)) return;
+        return res.status(200).json({inbox: await server_service.clearInbox(req.headers.authtoken)});
+    } else return res.status(401).json({ erro: 'Deve passar o authToken do usuario como parametro dos headers' });
+});
+
 
 
 //  AUTHENTICATE A TOKEN CHECKING ITS EXISTENCE IN JWT DATABASE AND IN OUR DATABASE -  RETURNS TRUE IF IT EXISTS, FALSE OTHERWISE

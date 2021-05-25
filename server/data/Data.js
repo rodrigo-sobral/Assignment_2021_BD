@@ -46,13 +46,13 @@ exports.postAuction = async (new_auction, seller_id) => {
 }
 
 exports.searchSpecificAuction= async (parameter, parameter_value, only_running=true) => {
-	if (only_running) return (await database.query(`select * from leilao where ${parameter}= \'${parameter_value}\' and fechado=false`))[0];
-	return (await database.query(`select * from leilao where ${parameter}= \'${parameter_value}\'`))[0];
+	if (only_running) return (await database.query(`select * from leilao where ${parameter}= \'${parameter_value}\' and fechado=false`));
+	return (await database.query(`select * from leilao where ${parameter}= \'${parameter_value}\'`));
 }
 
-exports.getAuctionByArtigoOrDescricao= async (parameter_value) => {
+exports.getAuctionByArtigoidOrDescricao= async (parameter_value) => {
 	if (typeof parameter_value!=='string') return await database.query(`select leilaoId, descricao from leilao where artigoId= ${parameter_value} and fechado=false`);
-	else return await database.query(`select leilaoId, descricao from leilao where descricao like \'%${parameter_value}%\' and fechado=false`);
+	return await database.query(`select leilaoId, leilao.descricao from leilao, artigo where artigo_artigoid=artigoid and artigo.descricao like \'%${parameter_value}%\' and fechado=false`);
 }
 
 exports.updateSpecificAuction= async (leilaoId, updated_parameter, updated_value) => {
@@ -70,21 +70,17 @@ exports.getMaxBidFromAuction= async (what_to_get, parameter, parameter_value) =>
 	return await database.query(`select ${what_to_get} from leilao, licitacao where leilao.leilaoId=licitacao.leilao_leilaoId and ${parameter}= \'${parameter_value}\'`);
 }
 
-exports.makeBid= async (valor_licitado, leilaoid, buyerId) => {
+exports.makeBid= async (valor_licitado, leilaoId, buyerId) => {
 	await database.query('begin transaction');
 	await database.query('LOCK TABLE licitacao IN EXCLUSIVE MODE');
-	await database.query('insert into licitacao (valor_licitado, users_userid, leilao_leilaoid) values ($1, $2, $3)', [valor_licitado, buyerId, leilaoid]);
+	await database.query('insert into licitacao (valor_licitado, users_userid, leilao_leilaoid) values ($1, $2, $3)', [valor_licitado, buyerId, leilaoId]);
 	await database.query('commit');
+	const previous_winnerid= (await this.getMaxBidFromAuction('leilao.users_userid', 'leilao.leilaoid', leilaoId))[0]['users_userid'];
+	if (previous_winnerid && previous_winnerid!==buyerId) await this.postNotificationInInbox(leilaoId, previous_winnerid, `A sua licitacao no leilao ${leilaoId} foi superada pelo utilizador ${buyerId} no valor de ${valor_licitado}`);
 }
 
-exports.getAllBidsOfAuction= async (leilaoId) => {
-	if (parseInt((await this.customRequest(`select count(*) from licitacao where leilao_leilaoid=${leilaoId}`))[0]['count'])==0) return null
-	return await database.query(`select licitacaoId, users_userId, valor_licitado from licitacao where leilao_leilaoid= ${leilaoId}`);
-}
-
-exports.getAllBidsOfUser= async (userId) => {
-	if (parseInt((await this.customRequest(`select count(*) from licitacao where users_userid=${userId}`))[0]['count'])==0) return null
-	return await database.query(`select leilao_leilaoid, users_userId, valor_licitado from licitacao where users_userid= ${userId}`);
+exports.getAllBidsOf= async (what_to_get, parameter, parameter_value) => {
+	return await database.query(`select ${what_to_get} valor_licitado from licitacao where ${parameter}= ${parameter_value}`);
 }
 
 //	===============================================================================================
@@ -95,12 +91,29 @@ exports.postMessageOnMural= async (leilaoId, userId, message) => {
 	await database.query('begin transaction');
 	await database.query('insert into mural (leilao_leilaoid, users_userid, mensagem) values ($1, $2, $3)', [leilaoId, userId, message])
 	await database.query('commit');
+	const mural_users= (await this.getAllMuralUsers(leilaoId, userId));
+	const sellerid = (await this.searchSpecificAuction('leilaoid', leilaoId))[0]['users_userid'];
+	await this.postNotificationInInbox(leilaoId, sellerid, `O Utilizador ${userId} disse no seu leilao ${leilaoId}: ${message}`);
+	if (mural_users) {
+		mural_users.forEach(async mural_userid => {
+			if (mural_userid['users_userid']!==sellerid)
+				await this.postNotificationInInbox(leilaoId, mural_userid['users_userid'], `O Utilizador ${userId} disse no leilao ${leilaoId}: ${message}`);
+		});
+	}
 }
 
-exports.getAllPostsOfAuction= async (leilaoId) => {
-	if (parseInt((await this.customRequest(`select count(*) from mural where leilao_leilaoid=${leilaoId}`))[0]['count'])==0) return null
-	return await database.query(`select mensagemId, users_userid, mensagem from mural where leilao_leilaoid= ${leilaoId}`);
+exports.getAllMuralUsers= async (leilaoId, userId) => { return await database.query(`select users_userid from mural where leilao_leilaoid= ${leilaoId} and users_userid!=${userId}`); }
+
+exports.getAllPostsOfAuction= async (leilaoId) => { return await database.query(`select users_userid, mensagem from mural where leilao_leilaoid= ${leilaoId}`); }
+
+exports.postNotificationInInbox= async (leilaoId, userId, message) => { 
+	await database.query('begin transaction');
+	await database.query('insert into inbox (leilao_leilaoid, users_userid, mensagem) values ($1, $2, $3)', [leilaoId, userId, message])
+	await database.query('commit');
 }
+exports.getInboxMessages= async (userId) => { return await database.query(`select leilao_leilaoid, mensagem from inbox where users_userid= ${userId}`); }
+exports.clearUserInbox= async (userId) => { return await database.query(`delete from inbox * where users_userid= ${userId}`); }
+
 
 //	===============================================================================================
 //	ARTIGO

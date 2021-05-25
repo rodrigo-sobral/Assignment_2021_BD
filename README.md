@@ -27,25 +27,6 @@ ___
 
 ___
 
-## Actual Plan - CheckList :brain: :clipboard:
-
-Task | Responsable | Done
--- | -- | --
-Registo de utilizadores. | Rodrigo | :heavy_check_mark:
-Autenticação de utilizadores. | Rodrigo | :heavy_check_mark:
-Criar um novo leilão. | Rodrigo | :heavy_check_mark:
-Listar todos os leilões existentes. | Rodrigo | :heavy_check_mark:
-Pesquisar leilões existentes. | Rodrigo | :heavy_check_mark:
-Consultar detalhes de um leilão. | Rodrigo | :heavy_check_mark:
-Listar todos os leilões em que o utilizador tenha atividade. | Rodrigo | :heavy_check_mark:
-Efetuar uma licitação num leilão. | Rodrigo | :heavy_check_mark:
-Editar propriedades de um leilão. | Rodrigo | :heavy_check_mark:
-Escrever mensagem no mural de um leilão. | Rodrigo | :heavy_check_mark:
-Entrega imediata de notificações a utilizadores. | Diogo | :x:
-Notificação de licitação ultrapassada. | Diogo | :x:
-Término do leilão na data, hora e minuto marcados. | Diogo | :x:
-
-___
 
 ## **Contributors** :sparkles:
 

@@ -68,50 +68,54 @@ exports.postNewAuction= async (new_auction, seller_token) => {
     }
 }
 
-exports.getAllRunningAuctions= async () => { return await data_management.customRequest('select leilaoId, descricao from leilao where fechado=false'); }
-
-exports.getAuctionByArtigoOrDescricao= async (keyword) => {
-    try {
-        const artigoId= parseInt(keyword);
-        return await data_management.getAuctionByArtigoOrDescricao(artigoId);
-    } catch (e) { return await data_management.getAuctionByArtigoOrDescricao(keyword); }
+exports.getAllRunningAuctions= async () => { 
+    const all_elections= await data_management.customRequest('select leilaoId, descricao from leilao where fechado=false'); 
+    for (const i in all_elections) {
+        if (!await this.checkAuctionLimit(all_elections[i])) delete all_elections[i];
+    }
+    return all_elections;
 }
 
-exports.getUserActivity= async (auth_token) => {
-    const user_id= (await data_management.searchSpecificUser('userid', 'authtoken', auth_token))[0]['userid'];
-    let user= {};
-    user['leiloes']= await data_management.searchSpecificAuction('users_userid', user_id, false);
-    user['licitacoes']= await data_management.getAllBidsOfUser(user_id);
-    return user;
+exports.getAuctionByArtigoidOrDescricao= async (keyword) => {
+    try {
+        const artigoId= parseInt(keyword);
+        return await data_management.getAuctionByArtigoidOrDescricao(artigoId);
+    } catch (e) { return await data_management.getAuctionByArtigoidOrDescricao(keyword); }
 }
 
 exports.getAllInfoAboutSpecificAution= async (leilaoId) => {
     try { 
-        const election= await data_management.searchSpecificAuction('leilaoId', leilaoId, false);
-        election['mural']= await data_management.getAllPostsOfAuction(leilaoId);
-        election['licitacoes']= await data_management.getAllBidsOfAuction(leilaoId);
-        return election; 
+        const selected_auction= (await data_management.searchSpecificAuction('leilao.leilaoId', leilaoId, false))[0];
+        if (!await this.checkAuctionLimit(selected_auction['limite'])) throw new Error('O Leilao encontra-se encerrado');
+        else {
+            selected_auction['mural']= await data_management.getAllPostsOfAuction(leilaoId);
+            selected_auction['licitacoes']= await data_management.getAllBidsOf('licitacaoId, users_userId, valor_licitado', 'leilao_leilaoid', leilaoId);
+            return selected_auction; 
+        }
     } catch (e) { throw new Error('leilaoId Invalido'); }
+}
+
+exports.getUserActivity= async (auth_token) => {
+    const user_id= (await data_management.searchSpecificUser('userid', 'authtoken', auth_token))[0]['userid'];
+    return {
+        leiloes: await data_management.searchSpecificAuction('users_userid', user_id, false),
+        licitacoes: await data_management.getAllBidsOf('leilao_leilaoid, users_userId, valor_licitado', 'users_userid', user_id)
+    };
 }
 
 exports.makeBid= async (leilaoId, licitacao, buyer_token) => {
     const selected_auction= (await data_management.searchSpecificAuction('leilaoId', leilaoId))[0]; 
     if (!selected_auction) throw new Error('leilaoId Invalido');
+    if (!await this.checkAuctionLimit(selected_auction['limite'])) throw new Error('O Leilao encontra-se encerrado');
+
+    const buyer_id= (await data_management.searchSpecificUser('userId', 'authtoken', buyer_token))[0]['userid'];
+    if (buyer_id===parseInt(selected_auction['users_userid'])) throw new Error('Nao pode licitar o seu proprio leilao');
     
-    const max_bid= (await data_management.getMaxBidFromAuction('max(valor_licitado)', 'leilaoId', leilaoId))[0]['max'];
-    if (max_bid) {
-        if (licitacao>max_bid) {
-            //  ADD BID
-            const buyer_id= (await data_management.searchSpecificUser('userId', 'authtoken', buyer_token))[0]['userid'];
-            if (buyer_id===parseInt(selected_auction['users_userid'])) throw new Error('Nao pode licitar o seu proprio leilao');
-            await data_management.makeBid(licitacao, selected_auction['leilaoid'], buyer_id);
-            return (await data_management.customRequest(`select max(licitacaoid) from licitacao where leilao_leilaoid=${leilaoId} and users_userid=${buyer_id}`))[0]['max'];
-        } else throw new Error(`O valor proposto tem de ser superior a ${max_bid}`);
-    } 
     if (licitacao>selected_auction['precominimo']) {
+        const max_bid= (await data_management.getMaxBidFromAuction('max(valor_licitado)', 'leilaoId', leilaoId))[0]['max'];
+        if (max_bid && licitacao<=max_bid) throw new Error(`O valor proposto tem de ser superior a ${max_bid}`);
+        
         //  ADD BID
-        const buyer_id= (await data_management.searchSpecificUser('userId', 'authtoken', buyer_token))[0]['userid'];
-        if (buyer_id===parseInt(selected_auction['users_userid'])) throw new Error('Nao pode licitar o seu proprio leilao');
         await data_management.makeBid(licitacao, selected_auction['leilaoid'], buyer_id);
         return (await data_management.customRequest(`select max(licitacaoid) from licitacao where leilao_leilaoid=${leilaoId} and users_userid=${buyer_id}`))[0]['max'];
     } throw new Error(`O valor proposto tem de ser superior a ${selected_auction['precominimo']}`);
@@ -120,25 +124,29 @@ exports.makeBid= async (leilaoId, licitacao, buyer_token) => {
 exports.editAuction= async (edited_auction, leilaoId, seller_token) => {
     const referenced_auction= (await data_management.searchSpecificAuction('leilaoId', leilaoId))[0]; 
     if (!referenced_auction) throw new Error('leilaoId Invalido');
+    if (!await this.checkAuctionLimit(referenced_auction['limite'])) throw new Error('O Leilao encontra-se encerrado');
 
     const seller_id= (await data_management.searchSpecificUser('userId', 'authtoken', seller_token))[0]['userid'];
     if (seller_id!==parseInt(referenced_auction['users_userid'])) throw new Error('Apenas o Vendedor tem permissao para editar o leilao');
 
     if (leilaoId) {
         let changed= false;
+        //  CHANGE THE TITLE
         if (edited_auction['titulo'] && typeof edited_auction['titulo'] === 'string') {
             await data_management.updateSpecificAuction(leilaoId, 'titulo', '\''+edited_auction['titulo']+'\''); changed=true;
         } 
+        //  CHANGE THE DESCRIPTION
+        if (edited_auction['descricao'] && typeof edited_auction['descricao'] === 'string') {
+            await data_management.updateSpecificAuction(leilaoId, 'descricao', '\''+edited_auction['descricao']+'\''); changed=true;
+        }
+        //  CHANGE THE AUCTION LIMIT DATE (WITH DATE VERIFICATION)
         if (edited_auction['limite'] && typeof edited_auction['limite'] === 'string') {
             try { await data_management.updateSpecificAuction(leilaoId, 'limite', '\''+edited_auction['limite']+'\''); changed=true; } 
             catch (e) { 
                 if (e.message.includes('date/time field value out of range') || e.message.includes('invalid input syntax for type timestamp:'))  
-                    throw new Error('Inseriu um formato de Data invalido'); 
+                throw new Error('Inseriu um formato de Data invalido'); 
                 else console.log(e); 
             }
-        }
-        if (edited_auction['descricao'] && typeof edited_auction['descricao'] === 'string') {
-            await data_management.updateSpecificAuction(leilaoId, 'descricao', '\''+edited_auction['descricao']+'\''); changed=true;
         }
         //  IF THERE'S ALREADY A REGISTED BID, DOESN'T ALLOW TO EDIT MINIMUM PRICE
         if (edited_auction['precoMinimo'] && typeof edited_auction['precoMinimo'] === 'number') {
@@ -149,18 +157,44 @@ exports.editAuction= async (edited_auction, leilaoId, seller_token) => {
             } else throw new Error(`Nao pode alterar o preco minimo porque ja existem ${registed_bids} licitacoes registadas`);
         }
 
+        //  IF NOTHING WAS CHANGED, THEN THE ARGUMENTS WERE WRONG
         if (!changed) throw new Error('Apenas pode alterar as propriedades {titulo, descricao, limite, precoMinimo (se nao houverem licitacoes registadas)}');
         return (await data_management.searchSpecificAuction('leilaoId', leilaoId))[0];
     } throw new Error('leilaoId Invalido');
 }
 
+//	===============================================================================================
+
 exports.writeInMural= async (leilaoId, user_token, message) => {
     const referenced_auction= (await data_management.searchSpecificAuction('leilaoId', leilaoId))[0]; 
     if (!referenced_auction) throw new Error('leilaoId Invalido');
+    if (!await this.checkAuctionLimit(referenced_auction['limite'])) throw new Error('O Leilao encontra-se encerrado');
     const user_id= (await data_management.searchSpecificUser('userId', 'authtoken', user_token))[0]['userid'];
 
     await data_management.postMessageOnMural(leilaoId, user_id, message);
-    return (await data_management.customRequest(`select max(mensagemId) from mural where users_userid=${user_id}`))[0]['max'];
+    return 'Mensagem Submetida com Sucesso';
+}
+
+exports.checkUserInbox= async (auth_token) => {
+    return await data_management.getInboxMessages((await data_management.searchSpecificUser('userid', 'authtoken', auth_token))[0]['userid']);
+}
+exports.clearInbox= async (auth_token) => {
+    await data_management.clearUserInbox((await data_management.searchSpecificUser('userid', 'authtoken', auth_token))[0]['userid']);
+    return 'Mensagens eliminadas com Sucesso';
 }
 
 //  =================================================================================================================
+//  RETURN TRUE IF THE LIMIT WASN'T REACHED, OTHERWISE CLOSES THE AUCTION AND RETURN FALSE
+exports.checkAuctionLimit= async (auction) => {
+    if (auction['limite'] - Date.now() > 0) return true;
+    //  CLOSE AUCTION
+    await data_management.updateSpecificAuction(auction['leilaoid'], 'fechado', true);
+    const winner= (await data_management.getMaxBidFromAuction('leilao.users_userid', 'leilao.leilaoid', auction['leilaoid']))[0]['users_userid'];
+    if (winner) await data_management.updateSpecificAuction(auction['leilaoid'], 'vencedorid', winner);
+    else {
+        await data_management.updateSpecificAuction(auction['leilaoid'], 'vencedorid', '*sem vencedor*');
+        await data_management.unAvailableArtigo(auction['artigo_artigoid'], false);
+    }
+    return false;
+}
+
