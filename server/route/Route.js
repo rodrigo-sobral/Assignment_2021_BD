@@ -2,28 +2,22 @@ const express = require('express');
 const router = express.Router();
 const server_service= require('../service/Service');
 const jwt = require('jsonwebtoken');
-require("dotenv-safe").config();
+require('dotenv-safe').config();
 
 //  ========================================================================================
 //  USERS
 //  ========================================================================================
-
-//  FOR TESTING PURPOSES ONLY
-//  ========================================================================================
-router.get('/dbproj/user', async (req, res) => { res.status(200).json(await server_service.getUsers()); });
 
 //  CREATE NEW USER
 //  ========================================================================================
 router.post('/dbproj/user', async function (req, res, next) {
 	const new_user= req.body;
     if (!new_user || Object.keys(new_user).length==0) 
-        return res.status(400).json({erro: 'Deve inserir um Novo Utilizador!'})
+        return res.status(400).json({erro: 'Deve inserir um Novo Utilizador'})
     if (Object.keys(new_user).length!=3 || !new_user['username'] || !new_user['email'] || !new_user['password']) 
         return res.status(400).json({erro: 'Deve inserir um Novo Utilizador com o seguinte conteudo: {\'username\', \'emails\', \'password\'}'})
-    try {
-        const new_user_id= await server_service.postNewUser(new_user);
-        return res.status(201).json(new_user_id);
-    } catch (e) { next(e); }
+    try { return res.status(201).json(await server_service.postNewUser(new_user)); } 
+    catch (e) { next(e); }
 });
 
 
@@ -65,20 +59,21 @@ router.post('/dbproj/leilao', async function (req, res, next) {
         if (!new_auction || Object.keys(new_auction).length==0) return res.status(400).json({erro: 'Deve inserir um Novo Leilao'})
         //  IF WE HAVE ALL THE NOT NULL PARAMETERS
         if (new_auction['artigoId'] && new_auction['titulo'] && new_auction['descricao'] && new_auction['limite']) {
-            //  IF WE ONLY HAVE 4 PARAMETERS (OR 5 IN CASE OF precoMinimo IS INCLUDED)
-            if (Object.keys(new_auction).length==4 || (Object.keys(new_auction).length==5 && new_auction['precoMinimo'])) {
+            //  IF WE ONLY HAVE 4 PARAMETERS (OR 5 IN CASE OF precominimo IS INCLUDED)
+            if (Object.keys(new_auction).length==4 || (Object.keys(new_auction).length==5 && new_auction['precominimo'])) {
+                if (new Date(new_auction['limite']) < Date.now()) return res.status(400).json({erro: 'Insira uma data posterior a data atual'});
                 if (typeof new_auction['artigoId']!=='number') 
                     return res.status(400).json({erro: 'artigoId deve ser um inteiro'})
-                if (new_auction['precoMinimo'] && typeof new_auction['precoMinimo']!=='number') 
-                    return res.status(400).json({erro: 'precoMinimo deve ser um float'})
+                if (new_auction['precominimo'] && typeof new_auction['precominimo']!=='number') 
+                    return res.status(400).json({erro: 'precominimo deve ser um float'})
                 try { 
                     const result = await server_service.postNewAuction(new_auction, req.headers.authtoken);
                     return res.status(201).json({leilaoId: result}); 
                 } catch (e) { next(e); }
             }
-            else return res.status(400).json({erro: 'Deve inserir um Novo Leilao com o seguinte conteudo: {\'titulo\', \'descricao\', \'precoMinimo\' (nao obrigatorio), \'limite\', \'artigoId\'}'})
+            else return res.status(400).json({erro: 'Deve inserir um Novo Leilao com o seguinte conteudo: {\'titulo\', \'descricao\', \'precominimo\' (nao obrigatorio), \'limite\', \'artigoId\'}'})
         }
-        else return res.status(400).json({erro: 'Deve inserir um Novo Leilao com o seguinte conteudo: {\'titulo\', \'descricao\', \'precoMinimo\' (nao obrigatorio), \'limite\', \'artigoId\'}'})
+        else return res.status(400).json({erro: 'Deve inserir um Novo Leilao com o seguinte conteudo: {\'titulo\', \'descricao\', \'precominimo\' (nao obrigatorio), \'limite\', \'artigoId\'}'})
     } else return res.status(401).json({ erro: 'Deve passar o authToken do usuario como parametro dos headers' });
 });
 
@@ -151,7 +146,7 @@ router.put('/dbproj/leilao', async function (req, res, next) {
         const edited_auction= req.body;
         if (!edited_auction || Object.keys(edited_auction).length==0) return res.status(400).json({erro: 'Deve inserir as informacoes que pretende editar'});
         if (!req.query.leilaoId) return res.status(400).json({erro: 'Deve passar o leilaoId por parametro'});
-        if (Object.keys(edited_auction).length>4) return res.status(400).json({erro: 'Apenas pode alterar as propriedades {titulo, descricao, limite, precoMinimo (se nao houverem licitacoes registadas)}'});
+        if (Object.keys(edited_auction).length>4) return res.status(400).json({erro: 'Apenas pode alterar as propriedades {titulo, descricao, limite, precominimo (se nao houverem licitacoes registadas)}'});
         
         try { return res.status(200).json(await server_service.editAuction(edited_auction, req.query.leilaoId, req.headers.authtoken)); } 
         catch (e) { next(e); }
@@ -164,9 +159,9 @@ router.post('/dbproj/leilao/mural', async function (req, res, next) {
     if (req.headers.authtoken) {
         if (!await tokenAuthentication(req, res)) return;
         if (!req.query.leilaoId) return res.status(400).json({erro: 'Deve passar o leilaoId por parametro'});
-        if (!req.body["mensagem"]) return res.status(400).json({erro: 'Deve inserir a sua mensagem com o formato { mensagem: ... }'});
+        if (!req.body['mensagem']) return res.status(400).json({erro: 'Deve inserir a sua mensagem com o formato { mensagem: ... }'});
 
-        try { return res.status(200).json({resp: await server_service.writeInMural(req.query.leilaoId, req.headers.authtoken, req.body["mensagem"])}); } 
+        try { return res.status(200).json({resp: await server_service.writeInMural(req.query.leilaoId, req.headers.authtoken, req.body['mensagem'])}); } 
         catch (e) { next(e); }
     } else return res.status(401).json({ erro: 'Deve passar o authToken do usuario como parametro dos headers' });
 });
@@ -189,6 +184,14 @@ router.delete('/dbproj/user/inbox', async function (req, res, next) {
     } else return res.status(401).json({ erro: 'Deve passar o authToken do usuario como parametro dos headers' });
 });
 
+//  GET PRODUCTS
+//  ========================================================================================
+router.get('/dbproj/artigos', async function (req, res, next) {
+    if (req.headers.authtoken) {
+        if (!await tokenAuthentication(req, res)) return;
+        return res.status(200).json(await server_service.getAllArtigos());
+    } else return res.status(401).json({ erro: 'Deve passar o authToken do usuario como parametro dos headers' });
+});
 
 
 //  AUTHENTICATE A TOKEN CHECKING ITS EXISTENCE IN JWT DATABASE AND IN OUR DATABASE -  RETURNS TRUE IF IT EXISTS, FALSE OTHERWISE
@@ -208,7 +211,7 @@ const tokenAuthentication= async (req, res) => {
             res.status(401).json({ erro: 'Precisa de ter uma sessao iniciada!' });
             return false
         }
-        // se tudo estiver ok, salva no request para uso posterior
+        // IF IT'S EVERYTHING OK, STORES IN THE REQUEST TO FUTURE USES
         req.userId = decoded.id;
         return true;
     })

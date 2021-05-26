@@ -12,7 +12,7 @@ app.use(function (error, req, res, next) {
 	} 
 	
 	//	BAD REQUEST
-	else if (error.message === 'leilaoId Invalido' || error.message==='Token Invalido' || error.message === 'Inseriu um formato de Data invalido' || error.message === 'Apenas pode alterar as propriedades {titulo, descricao, limite, precoMinimo (se nao houverem licitacoes registadas)}' || error.message === 'artigoId Invalido' || error.message === 'Voce ja tem a sessao iniciada!') {
+	else if (error.message === 'leilaoId Invalido' || error.message==='Token Invalido' || error.message === 'Inseriu um formato de Data invalido' || error.message === 'Apenas pode alterar as propriedades {titulo, descricao, limite, precominimo (se nao houverem licitacoes registadas)}' || error.message === 'artigoId Invalido' || error.message === 'Voce ja tem a sessao iniciada!' || error.message === 'Insira uma data posterior a data atual') {
 		return res.status(400).json({erro: error.message});
 	} 
 	
