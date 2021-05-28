@@ -86,13 +86,13 @@ exports.getAuctionByArtigoidOrDescricao= async (keyword) => {
 }
 
 exports.getAllInfoAboutSpecificAution= async (leilaoId) => {
-    try { 
-        const selected_auction= (await data_management.searchSpecificAuction('*', 'leilao.leilaoId', leilaoId, false))[0];
-        selected_auction['mural']= await data_management.getAllPostsOfAuction(leilaoId);
-        selected_auction['licitacoes']= await data_management.getAllBidsOf('licitacaoId, users_userId, valor_licitado', 'leilao_leilaoid', leilaoId);
-        selected_auction['versoes_anteriores']= await data_management.getLastVersions(leilaoId);
-        return selected_auction; 
-    } catch (e) { throw new Error('leilaoId Invalido'); }
+    const selected_auction= (await data_management.searchSpecificAuction('*', 'leilao.leilaoId', leilaoId, false))[0];
+    if (!selected_auction) throw new Error('leilaoId Invalido');
+    this.checkAuctionLimit(selected_auction);
+    selected_auction['mural']= await data_management.getAllPostsOfAuction(leilaoId);
+    selected_auction['licitacoes']= await data_management.getAllBidsOf('licitacaoId, users_userId, valor_licitado', 'leilao_leilaoid',leilaoId);
+    selected_auction['versoes_anteriores']= await data_management.getLastVersions(leilaoId);
+    return selected_auction; 
 }
 
 exports.getUserActivity= async (auth_token) => {
@@ -189,7 +189,7 @@ exports.getAllArtigos= async () => { return await data_management.customRequest(
 //  =================================================================================================================
 //  RETURN TRUE IF THE LIMIT WASN'T REACHED, OTHERWISE CLOSES THE AUCTION AND RETURN FALSE
 exports.checkAuctionLimit= async (auction) => {
-    if (auction['limite'] < Date.now()) return true;
+    if (new Date(auction['limite']) > Date.now()) return true;
     //  CLOSE AUCTION
     await data_management.updateSpecificAuction(auction['leilaoid'], 'fechado', true);
     const winner= (await data_management.getMaxBidFromAuction('leilao.users_userid', 'leilao.leilaoid', auction['leilaoid']))[0];

@@ -1,9 +1,6 @@
-# DataBases Assignment 2021
-___
-
 # *Lights, Camera, Auction* :clapper:
 
-***Lights, Camera, Auction*** is the name of our API, which pretends to manage an action ecosystem where people create an account, create an auction, and sell their goods to someone who's interested in them.
+***Lights, Camera, Auction*** is the name of our API, which pretends to manage an auction's ecosystem where people create an account, create their auctions, and sell their goods to someone who's interested in them.
 
 ___
 
@@ -15,21 +12,32 @@ ___
 
 ___
 
-:warning: **VERY IMPORTANTE NOTE:** 
-    
-    Keep all the files and directories as they are, otherwise, is not guaranteed it works.
+## ER Diagram
+
+![ER Diagram](Stage2/ER_Diagram.png)
+
+## RDM Diagram
+
+![ER Diagram](Stage2/RDM_Diagram.png)
+
+___
 
 ## How to run it :running:
 
-First of all you'll need to build a ***nodejs*** package with some dependencies, so you must run:
+:warning: **Keep all the files and directories as they are, otherwise, is not guaranteed it works.**
+
+
+:floppy_disk: First of all you'll need to build a ***nodejs*** package with some dependencies, so you must run:
 
 - `npm init -y`
 
 - `npm install express body-parser pg-promise jest axios jsonwebtoken dotenv-safe`
 
-Now you may be able to deploy it, do it running `node server`.
+:atm: Now you may be able to deploy it, do it running `node server`.
 
-You can also test it with `npm run test`, however, not all tests are implemented.
+:vertical_traffic_light: You can also test it with `npm run test`, however, not all tests are implemented.
+
+:earth_americas: Make it public with `./ngrok http 8080 -host-header="localhost:8080"`
 
 ___
 
@@ -186,7 +194,7 @@ headers:
 
 - Edit An Auction
 ```rest
-PUT http://localhost:8080/dbproj/leilao/?leilaoId=13
+PUT http://localhost:8080/dbproj/leilao/?leilaoId=
 
 queries:
 {
@@ -256,6 +264,30 @@ headers:
     "authtoken": "yourtoken123"
 }
 ```
+
+___
+
+## Development Plan :brain:
+
+Task | Responsable | Done
+-- | -- | --
+Registo de utilizadores. | Rodrigo | :heavy_check_mark:
+Autenticação de utilizadores. | Rodrigo | :heavy_check_mark:
+Criar um novo leilão. | Rodrigo | :heavy_check_mark:
+Listar todos os leilões existentes. | Diogo | :heavy_check_mark:
+Pesquisar leilões existentes. | Diogo | :heavy_check_mark:
+Consultar detalhes de um leilão. | Rodrigo | :heavy_check_mark:
+Listar todos os leilões em que o utilizador tenha atividade. | Diogo | :heavy_check_mark:
+Efetuar uma licitação num leilão. | Rodrigo | :heavy_check_mark:
+Editar propriedades de um leilão. | Diogo | :heavy_check_mark:
+Escrever mensagem no mural de um leilão. | Diogo | :heavy_check_mark:
+Entrega imediata de notificações a utilizadores. | Rodrigo | :heavy_check_mark:
+Notificação de licitação ultrapassada. | Rodrigo | :heavy_check_mark:
+Término do leilão na data, hora e minuto marcados. | Diogo | :heavy_check_mark:
+Extras | -- | --
+Terminar Sessão. | Rodrigo | :heavy_check_mark:
+Limpar Notificações. | Rodrigo | :heavy_check_mark:
+Consultar Artigos. | Rodrigo | :heavy_check_mark:
 
 ___
 

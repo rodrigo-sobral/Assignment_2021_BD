@@ -93,9 +93,9 @@ router.get('/dbproj/leiloes', async function (req, res, next) {
             if (auctions.length==0) return res.status(404).json({erro: 'Nao ha leiloes registados'});
             return res.status(200).json(auctions);
         }
-        return res.status(400).json({erro: 'A query so pode ter o seguinte formato: .../?keyword='});
+        else return res.status(400).json({erro: 'A query so pode ter o seguinte formato: .../?keyword='});
     }
-    return res.status(401).json({ erro: 'Deve passar o authToken do usuario como parametro dos headers' });
+    else return res.status(401).json({ erro: 'Deve passar o authToken do usuario como parametro dos headers' });
 });
 
 //  GET ALL INFORMATION ABOUT A SPECIFIC AUCTION BY LEILAOID
@@ -110,7 +110,7 @@ router.get('/dbproj/leilao', async function (req, res, next) {
                 if (auctions.length==0) return res.status(404).json({erro: `Nao foram encontrados leiloes com a leilaoId= ${req.query.leilaoId}`});
                 return res.status(200).json(auctions);
             } catch (e) { next(e); }
-        } return res.status(400).json({erro: 'A query deve ter o seguinte formato: .../?leilaoId='});
+        } else return res.status(400).json({erro: 'A query deve ter o seguinte formato: .../?leilaoId='});
     } else return res.status(401).json({ erro: 'Deve passar o authToken do usuario como parametro dos headers' });
 });
 
