@@ -130,7 +130,7 @@ exports.postMessageOnMural= async (leilaoId, userId, message) => {
 		mural_users.forEach(async mural_userid => {
 			if (mural_userid['users_userid']!==sellerid)
 				await this.postNotificationInInbox(leilaoId, mural_userid['users_userid'], `O Utilizador ${userId} disse no leilao ${leilaoId}: ${message}`);
-		});
+			});
 	}
 }
 
@@ -150,6 +150,7 @@ exports.getAllPostsOfAuction= async (leilaoId) => {
 
 exports.postNotificationInInbox= async (leilaoId, userId, message) => { 
 	await database.query('begin transaction');
+	await database.query('LOCK TABLE inbox IN ACCESS EXCLUSIVE MODE');
 	await database.query('insert into inbox (leilao_leilaoid, users_userid, mensagem) values ($1, $2, $3)', [leilaoId, userId, message])
 	await database.query('commit');
 }
@@ -160,8 +161,7 @@ exports.getInboxMessages= async (userId) => {
 	return messages;
 }
 exports.clearUserInbox= async (userId) => { 
-	await database.query('begin transaction isolation level read committed');
-	await database.query('LOCK TABLE inbox IN ACCESS EXCLUSIVE MODE');
+	await database.query('begin transaction');
 	await database.query(`delete from inbox * where users_userid= ${userId}`); 
 	await database.query('commit');
 }
