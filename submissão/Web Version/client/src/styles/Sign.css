@@ -1,0 +1,81 @@
+#sign{
+  width: 400px;
+  height: auto;
+  margin: 5% auto;
+  
+
+  /*font*/
+  color: #000000;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 1.25em;
+  line-height: 4vh;
+
+  /*background*/
+ border-style: solid;
+}
+  
+#inner{
+  padding: 2em;
+}
+
+#sign h1{
+  position: relative;
+  margin: 10%;
+  text-align: center;
+  /*font*/
+  color: #000000;
+
+  font-weight: 700;
+  font-size: 2em;
+}
+
+label{
+  display: block;
+  margin-top: 1em;
+}
+
+#sign input{
+  width: 100%;
+  height: 30px;
+  border-radius: 10px;
+  border-style: none;
+}
+
+#sign a{
+  display: block;
+  width: 100%;
+  /*font*/
+  color: #001DB5;
+  font-style: normal;
+  font-weight: 300;
+  font-size: 0.8em;
+  /*cursor*/
+  cursor:pointer;
+}
+
+#sign button{
+
+  margin-top: 20px;
+
+  position: relative;
+  width: 40%;
+  height: 1.5em;
+  left: 30%;
+  top: 10%;
+    /*color*/
+  background: #000000;
+  color: #FFFFFF;
+    /*border*/
+  border-radius: 10px;
+  border-style: none;
+    /*font*/
+  font-style: normal;
+  font-weight: bold;
+  font-size: 1em;
+    /*cursor*/
+  cursor: pointer;
+}
+#sign button:hover{
+  background: #303030;
+}

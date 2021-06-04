@@ -1,0 +1,67 @@
+#recipe{
+    margin: auto;
+    width: 80%;
+    margin-top: 4em;
+}
+
+#recipe h1, #recipe h2{
+    color: #000000; 
+    margin-bottom: 0px;
+}
+
+#recipe h3{
+    color: #000000; 
+    margin-top: 0px;
+}
+
+#recipe p{
+    padding-left: 1em; 
+}
+
+#recipe p, #recipe ul{
+    margin-top: 0.5em; 
+}
+
+#recipe #group {
+    display: flex;
+}
+
+#recipe #group div{
+    max-width: 60%;
+}
+
+#recipe #group img{
+    height: 100px;
+    margin: auto;
+}
+
+
+#recipeBox{
+    width: 100%;
+    height: auto;
+    padding: 2em 1.5em;
+    
+    background: #FFFFFF;
+    border-style: solid;
+    border-color: #000000;
+}
+
+#recipeBox > p{
+    white-space: pre-line;
+}
+#clearnots{
+  position: relative;
+  text-align: center;
+  width: 40%;
+  height: 3em;
+  left: 30%;
+  top: 10%;
+  cursor: pointer;
+}
+#product{
+    cursor: pointer; 
+}
+#product:hover{
+    background-color: #AAAAAA;
+}
+#product:active, #product:focus { background: gray; }
