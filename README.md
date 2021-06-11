@@ -267,29 +267,6 @@ headers:
 
 ___
 
-## Development Plan :brain:
-
-Task | Responsable | Done
--- | -- | --
-Registo de utilizadores. | Rodrigo | :heavy_check_mark:
-Autenticação de utilizadores. | Rodrigo | :heavy_check_mark:
-Criar um novo leilão. | Rodrigo | :heavy_check_mark:
-Listar todos os leilões existentes. | Diogo | :heavy_check_mark:
-Pesquisar leilões existentes. | Diogo | :heavy_check_mark:
-Consultar detalhes de um leilão. | Rodrigo | :heavy_check_mark:
-Listar todos os leilões em que o utilizador tenha atividade. | Diogo | :heavy_check_mark:
-Efetuar uma licitação num leilão. | Rodrigo | :heavy_check_mark:
-Editar propriedades de um leilão. | Diogo | :heavy_check_mark:
-Escrever mensagem no mural de um leilão. | Diogo | :heavy_check_mark:
-Entrega imediata de notificações a utilizadores. | Rodrigo | :heavy_check_mark:
-Notificação de licitação ultrapassada. | Rodrigo | :heavy_check_mark:
-Término do leilão na data, hora e minuto marcados. | Diogo | :heavy_check_mark:
-Extras | -- | --
-Terminar Sessão. | Rodrigo | :heavy_check_mark:
-Limpar Notificações. | Rodrigo | :heavy_check_mark:
-Consultar Artigos. | Rodrigo | :heavy_check_mark:
-
-___
 
 ## **Contributors** :sparkles:
 
@@ -298,9 +275,9 @@ Bases de Dados - 2020/2021 <br>
 Coimbra, 31 de maio de 2021
 </b></i></html>
 
-:mortar_board: Diogo Flórido - uc2018282583@student.uc.pt	
+:mortar_board: Diogo Flórido
 
-:mortar_board: ***[Rodrigo Fernando Henriques Sobral](https://github.com/RodrigoSobral2000)*** - uc2018298209@student.uc.pt
+:mortar_board: ***[Rodrigo Fernando Henriques Sobral](https://github.com/RodrigoSobral2000)***
 
 ___
 
