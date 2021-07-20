@@ -14,11 +14,11 @@ ___
 
 ## ER Diagram
 
-![ER Diagram](Stage2/ER_Diagram.png)
+![ER Diagram](Delivers/Stage2/ER_Diagram.png)
 
 ## RDM Diagram
 
-![ER Diagram](Stage2/RDM_Diagram.png)
+![ER Diagram](Delivers/Stage2/RDM_Diagram.png)
 
 ___
 
