@@ -26,6 +26,8 @@ ___
 
 :warning: **Keep all the files and directories as they are, otherwise, is not guaranteed it works.**
 
+:warning: **Create a *.env* file and a *.env.example* file with the following content: `SECRET=`*your secret***
+
 
 :floppy_disk: First of all you'll need to build a ***nodejs*** package with some dependencies, so you must run:
 
