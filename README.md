@@ -6,9 +6,7 @@ ___
 
 ## Used Technologies :computer:
 
-1. ***NodeJS***
-2. ***PostgreSQL*** 
-3. ***Visual Studio Code***
+<img src="https://img.icons8.com/color/48/000000/nodejs.png"/> <img src="https://img.icons8.com/color/48/000000/postgreesql.png"/> <img src="https://img.icons8.com/color/48/000000/visual-studio-code-2019.png"/>
 
 ___
 
